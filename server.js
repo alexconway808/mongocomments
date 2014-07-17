@@ -34,7 +34,7 @@ server.get(/.*/, function (req, res) {
   //Display the comments in the browser at localhost: 1337
   Comment.find(function (err, comments){
     for (i in comments){
-      body += comments[i].comment_text;
+      body += comments[i].comment_text + '<br>';
     }
     res.writeHead(200, {
       'Content-Length': Buffer.byteLength(body),
