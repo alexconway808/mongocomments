@@ -1,9 +1,7 @@
-//restify docs
-//mongo docs
 
-var fs = require('fs');
-
+var restify = require('restify');
 var mongoose = require ('mongoose');
+
 mongoose.connect('mongodb://user1:Bunny2010!@ds061298.mongolab.com:61298/mongocomments') // copy in url from mongodb and add my username in front
 
 //Create the comment schema
@@ -17,7 +15,6 @@ var commentSchema = new Schema({
 //Define the comment model
 var Comment = mongoose.model('Comment', commentSchema);
 
-var restify = require('restify');
 
 var server = restify.createServer({
   name: 'app',
@@ -34,23 +31,30 @@ server.get(/.*/, function (req, res) {
   
   var body = "Hello World";
   
-  res.writeHead(200, {
-    'Content-Type': Buffer.byteLength(body),
-    'Content-Type' : 'text/html'
-  });
+  //Display the comments in the browser at localhost: 1337
+  Comment.find(function (err, comments){
+    for (i in comments){
+      body += comments[i].comment_text;
+    }
+    res.writeHead(200, {
+      'Content-Length': Buffer.byteLength(body),
+      'Content-Type' : 'text/html'
+    });
 
-  res.write(body);
-  res.send();
+    res.write(body);
+    res.send();
+  });
 
 });
 
 
-server.post('/post_comment', function(req, res){
+server.post('/post_comment', function (req, res){
   var comment = new Comment ({
     comment_text: req.body.comment
   });
 
-  comment.save(function(err){
+  comment.save(function (err){
+    if (err) res.send(err);
 
     res.send("Your comments have been saved");
 
